@@ -1,0 +1,30 @@
+import pyttsx3
+from bs4 import BeautifulSoup
+import requests
+
+# Need to install modules: [pyttsx3, beautifulsoup4, lxml, requests] using pip install <module>
+
+# Setup the text to speech engine:
+engine = pyttsx3.init()
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[1].id)   #changing index, changes voices. 1 for female
+engine.setProperty('rate', 150)     # setting up new voice rate
+
+# Lookup table to acces the website easier. 
+sign_num = {}
+index = 1
+for sign in ["Ares", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", 
+             "Scorpio", "Sagittarius","Capricorn", "Aquarius", "Pises"]:
+    sign_num[sign] = index
+    index += 1
+
+for star_sign in ["Virgo", "Leo", "Cancer"]:
+    idx = sign_num[star_sign]
+    html_text = requests.get("https://www.horoscope.com/us/horoscopes/general/horoscope-general-daily-today.aspx?sign={:d}".format(idx)).text
+    soup = BeautifulSoup(html_text, "lxml")
+    scope = soup.find('p').text
+    scope = scope.split("-", 1)[1]
+    engine.say("Todays horoscope for {}.".format(star_sign))
+    engine.runAndWait()
+    engine.say(scope)
+    engine.runAndWait()
